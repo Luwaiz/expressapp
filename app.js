@@ -43,17 +43,83 @@
 const express=require('express')
 const app= express()
 const mongoose=require("mongoose")
+const User = require('./models/UserModel')
 const port= 5000
 
-app.get('/',(req,res)=>{
-    res.send("hello a get ")
+//middleware for the app to be able to accept json files
+app.use(express.json())
+//middleware for the app to be able to accept data through form
+app.use(express.urlencoded({extended:false}))
+
+//get method to get all the users in database
+app.get('/users',async(req,res)=>{
+    try{
+      const users= await User.find({})
+      res.status(200).json(users)
+    }
+    catch(e){
+      res.status(500).json({message:e.message})
+    }
 })
-app.post('/User' ,(req,res)=>{
+
+//get method to get user by id from the database
+app.get("/user/:id",async (req,res)=>{
+  try{
+    const {id}=req.params
+    const user = await User.findById(id)
+    res.status(200).json(user)
+  }
+  catch(e){
+    res.status(500).json({message:e.message})
+  }
+})
+
+//delete method to delete user by id from the database
+app.delete("/user/:id",async (req,res)=>{
+  try{
+    const {id}=req.params
+    const user = await User.findByIdAndDelete(id)
+    res.status(200).json(user)
+    if(!user){
+      res.status(404).json({message: `cannot find user with the Id ${id}`})
+    }
+    res.status(200).json(user)
+  }
+  catch(e){
+    res.status(500).json({message:e.message})
+  }
+})
+
+
+//post method to request for the user details
+app.post("/user" ,async (req,res)=>{
+
+  try{
+    const user= await User.create(req.body)
+    res.status(200).json(user)
+  }
+  catch(e){
+    console.log(e.message)
+    res.status(500).json({message: e.message})
+  }
     console.log(req.body)
-    res.send("gatti")
 })
 
-
+//put method to update a user
+app.put("/user/:id", async (req,res)=>{
+  try{
+    const {id}=req.params
+    const user = await User.findByIdAndUpdate(id,req.body)
+    if(!user){
+      res.status(404).json({message: `cannot find user with the Id ${id}`})
+    }
+    const UpdatedUser = await User.findById(id)
+    res.status(200).json(UpdatedUser)
+  }
+  catch(e){
+    res.status(500).json({message: e.message})
+  }
+})
 
 mongoose.connect("mongodb+srv://admin:Eluwaiz321@ciboapi.vez1aya.mongodb.net/NODEAPI?retryWrites=true&w=majority&appName=ciboAPI")
 .then(()=>{
