@@ -1,5 +1,6 @@
 const mongoose=require("mongoose")
 const {isEmail}=require("validator")
+const bcrypt = require("bcrypt")
 
 const userSchema = mongoose.Schema(
     {
@@ -19,12 +20,26 @@ const userSchema = mongoose.Schema(
             type:String,
             required:[true,"Please enter password"],
             minlength:[8,"Password must be at least 8 characters long"]
+        },
+        
+    },
+    {
+        token:{
+            type:String,
+            required:true
         }
     },
     {
         timestamps:true
     }
 )
+
+userSchema.pre("save", async function (next){
+    const salt = await bcrypt.genSalt()
+    this.password = await bcrypt.hash(this.password,salt)
+    next()
+})
+
 const User = mongoose.model("user",userSchema)
 
 module.exports=User

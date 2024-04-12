@@ -3,6 +3,7 @@ const express=require('express')
 const app= express()
 const cors = require('cors')
 const mongoose=require("mongoose")
+const cookieParser =  require("cookie-parser")
 
 //imports
 const UserRouter = require("./routes/users")
@@ -22,9 +23,10 @@ app.use("/api/recipe" ,RecipeRouter)
 app.use(express.json())
 //middleware for the app to be able to accept data through form
 app.use(express.urlencoded({extended:false}))
-// error middleware
+// middleware for cookie parser
+app.use(cookieParser())
+// error handler middleware
 app.use(ErrorMiddleware)
-
 
 app.get("/",(req,res)=>{
   res.send("hahaha")
