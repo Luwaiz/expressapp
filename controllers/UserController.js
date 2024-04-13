@@ -2,13 +2,14 @@ const User = require("../models/UserModel")
 const asyncHandler = require('express-async-handler')
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const { token } = require("morgan")
 
 
 
 // error handling function
 const ErrorHandler=(e)=>{
   console.log(e.message,e.code)
-  let error={username: "",email:"", password: "",}
+  let error={username: "",email:"", password: "",token: "",}
   if(e.message.includes("user validation failed")){
     Object.values(e.errors).forEach(({properties})=>{
       console.log(properties.path)
@@ -27,7 +28,7 @@ const ErrorHandler=(e)=>{
 
 // create a  user token
 const maxTime= 24*60*60
-const createToken =(id)=>{
+const createToken = (id)=>{
   return jwt.sign({id},"I have never seen what the united states look like but i want to go to canada ",{
     expiresIn:maxTime
   })
@@ -38,17 +39,18 @@ const userSignUp = async (req,res)=>{
     try{
       
       const user= await User.create(req.body)
-      const tokenId = createToken(user._id)
-      res.cookie("JWT",tokenId,{httpOnly:true,maxAge:maxTime*1000})
-      const token =user.token
-      console.log(tokenId)
-      res.status(200).json({user,token:tokenId})
+      console.log(user)
+      const token = createToken(user._id)
+      console.log(token)
+      res.cookie("who",token,{httpOnly:true,maxAge:maxTime*1000})
+      user.token=token
+      console.log(user)
+      res.status(200).json({user})
     }
     catch(e){
       const error=ErrorHandler(e)
       res.status(500).json({error})
     }
-      console.log(req.body)
     }
 
 //get all users
@@ -80,7 +82,8 @@ const userLogIn= async (req, res) => {
     if (!match) {
       return res.status(401).send('Invalid password');
     }
-    res.status(200).json(user);
+    res.status(200).json({successful : user});
+    
   } catch (e) {
     res.status(500).send(e.message);
   }

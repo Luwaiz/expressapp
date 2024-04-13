@@ -21,12 +21,9 @@ const userSchema = mongoose.Schema(
             required:[true,"Please enter password"],
             minlength:[8,"Password must be at least 8 characters long"]
         },
-        
-    },
-    {
         token:{
             type:String,
-            required:true
+            required:false
         }
     },
     {
@@ -42,4 +39,4 @@ userSchema.pre("save", async function (next){
 
 const User = mongoose.model("user",userSchema)
 
-module.exports=User
+module.exports= User
