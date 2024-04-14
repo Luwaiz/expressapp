@@ -42,7 +42,7 @@ const userSignUp = async (req,res)=>{
       console.log(user)
       const token = createToken(user._id)
       console.log(token)
-      res.cookie("who",token,{httpOnly:true,maxAge:maxTime*1000})
+      //res.cookie("who",token,{httpOnly:true,maxAge:maxTime*1000})
       user.token=token
       console.log(user)
       res.status(200).json({user})
@@ -82,10 +82,14 @@ const userLogIn= async (req, res) => {
     if (!match) {
       return res.status(401).send('Invalid password');
     }
-    res.status(200).json({successful : user});
+
+    const token= createToken(user._id)
+    user.token=token
+    res.status(200).json({user});
     
   } catch (e) {
-    res.status(500).send(e.message);
+    const error=ErrorHandler(e)
+    res.status(500).json({error})
   }
 }
 
