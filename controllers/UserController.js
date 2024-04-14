@@ -16,7 +16,6 @@ const ErrorHandler=(e)=>{
       error[properties.path]=properties.message
     })
   }
-
    if (e.code===11000){
     error.username=" User already exists"
     return error
@@ -25,14 +24,33 @@ const ErrorHandler=(e)=>{
   return error
 }
 
-
 // create a  user token
 const maxTime= 24*60*60
 const createToken = (id)=>{
-  return jwt.sign({id},"I have never seen what the united states look like but i want to go to canada ",{
+  return jwt.sign({id},process.env.JWT_SECRET,{
     expiresIn:maxTime
   })
 }
+
+//verify user token middleware
+const verifyToken= (req,res,next)=>{
+  const token=req.headers["Authorization"]
+  console.log(token)
+  if(!token){
+    return res.status(401).json({message:"token required"})
+  }
+  try{
+    const decoded=jwt.verify(token,process.env.JWT_SECRET)
+    req.body=decoded
+    next()
+  }  
+  catch(e){
+    console.log(e)
+    return res.status(401).json({message:`Invalid token ${e.message}`})
+  }
+
+}
+
 
 // user sign up
 const userSignUp = async (req,res)=>{
@@ -71,8 +89,7 @@ const getAllUsers = asyncHandler(async(req,res)=>{
 //logging in user
 const userLogIn= async (req, res) => {
   try{
-    const username=req.body.username
-    const password=req.body.password
+    const {username, password}=req.body
     const user = await User.findOne({username:username})
     if(!user){
       res.status(404)
@@ -85,13 +102,37 @@ const userLogIn= async (req, res) => {
 
     const token= createToken(user._id)
     user.token=token
+    await user.save()
     res.status(200).json({user});
     
   } catch (e) {
-    const error=ErrorHandler(e)
-    res.status(500).json({error})
+   
+     const error=ErrorHandler(e)
+     res.status(500).json({error})
   }
 }
+
+//get user profile
+
+const profile = async (req,res)=>{
+  try{
+    const id=req.user.id
+    const user = await User.findById(id)
+    if(!user){
+      res.status(404)
+      throw new Error(`cannot find user with the Id ${id}`)
+    }
+    res.status(200).json(user)
+  }
+  catch(e){
+    // res.status(500)
+    // console.log(error)
+    // throw new Error(error.message)\
+    const error=ErrorHandler(e)
+      res.status(500).json({error})
+  }
+  }
+
 
 // get user id
 const getUserById = asyncHandler(async (req,res)=>{
@@ -151,5 +192,7 @@ const updateUser =  asyncHandler(async (req,res)=>{
     deleteUserById,
     userSignUp,
     updateUser,
-    userLogIn
+    userLogIn,
+    profile,
+    verifyToken
   }

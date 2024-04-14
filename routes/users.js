@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {getAllUsers,getUserById,deleteUserById,userSignUp, updateUser,userLogIn}= require("../controllers/UserController");
+const {getAllUsers,getUserById,deleteUserById,
+    userSignUp, updateUser,userLogIn,profile,
+    verifyToken}= require("../controllers/UserController");
 const User = require('../models/UserModel');
 const cookieParser =  require("cookie-parser")
 
@@ -17,7 +19,7 @@ router.get('/',getAllUsers)
 router.post("/login",userLogIn)
 
 //get method to get user by id from the database
-router.get("/:id",getUserById)
+router.get("/profile",verifyToken,profile)
 
 //delete method to delete user by id from the database
 router.delete("/:id",deleteUserById)
