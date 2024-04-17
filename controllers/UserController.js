@@ -128,7 +128,7 @@ const profile = async (req,res)=>{
     // res.status(500)
     // console.log(error)
     // throw new Error(error.message)\
-    const error=ErrorHandler(e)
+      const error=ErrorHandler(e)
       res.status(500).json({error})
   }
   }
