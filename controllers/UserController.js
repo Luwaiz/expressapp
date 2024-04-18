@@ -56,7 +56,7 @@ const verifyToken= (req,res,next)=>{
     return res.status(401).json({message:`Invalid token ${err.message}`})
     }
     console.log(decoded)
-      req.body=decoded
+      req.decodedToken=decoded
       next()
     })
 
@@ -117,20 +117,16 @@ const userLogIn= async (req, res) => {
 
 const profile = async (req,res)=>{
   try{
-    const {id}=req.params
-    const user = await User.findById({id})
-    if(!user){
-      res.status(404)
-      throw new Error(`cannot find user with the Id ${id}`)
-    }
+    const id=req.decodedToken.id
+    const user = await User.profile(id)
     res.status(200).json(user)
   }
   catch(e){
     // res.status(500)
     // console.log(error)
     // throw new Error(error.message)\
-      const error=ErrorHandler(e)
-      res.status(500).json({error})
+    
+      res.status(500).json({message:e.message})
   }
   }
 

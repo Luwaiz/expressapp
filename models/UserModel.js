@@ -50,6 +50,15 @@ userSchema.statics.login = async function(username,password){
 
 }
 
+userSchema.statics.profile = async function(id){
+    const user = await this.findById({_id:id})
+    if(user){
+        return user
+    }
+    throw new Error(`cannot find user with the id${id}`)
+
+}
+
 const User = mongoose.model("user",userSchema)
 
 module.exports= User
