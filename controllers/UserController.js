@@ -20,7 +20,7 @@ const ErrorHandler=(e)=>{
   // username not found error handling
   if(e.message.includes("cannot find user with the username")){
     console.log(e.message)
-    error.email=e.message
+    error.username=e.message
   }
   // password invalid error handling
   if(e.message.includes("Invalid password")){
