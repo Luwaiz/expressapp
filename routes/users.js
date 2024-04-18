@@ -19,7 +19,7 @@ router.get('/',getAllUsers)
 router.post("/login",userLogIn)
 
 //get method to get user by id from the database
-router.get("/profile",verifyToken,profile)
+router.get("/profile/:id",verifyToken,profile)
 
 //delete method to delete user by id from the database
 router.delete("/:id",deleteUserById)

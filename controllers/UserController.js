@@ -10,11 +10,22 @@ const { token } = require("morgan")
 const ErrorHandler=(e)=>{
   console.log(e.message,e.code)
   let error={username: "",email:"", password: "",token: "",}
+  //user sign validation error handler
   if(e.message.includes("user validation failed")){
     Object.values(e.errors).forEach(({properties})=>{
       console.log(properties.path)
       error[properties.path]=properties.message
     })
+  }
+  // username not found error handling
+  if(e.message.includes("cannot find user with the username")){
+    console.log(e.message)
+    error.email=e.message
+  }
+  // password invalid error handling
+  if(e.message.includes("Invalid password")){
+    console.log(e.message)
+    error.password=e.message
   }
    if (e.code===11000){
     error.username=" User already exists"
@@ -34,20 +45,20 @@ const createToken = (id)=>{
 
 //verify user token middleware
 const verifyToken= (req,res,next)=>{
-  const token=req.headers["Authorization"]
+  const token=req.headers["authorization"]
   console.log(token)
   if(!token){
     return res.status(401).json({message:"token required"})
   }
-  try{
-    const decoded=jwt.verify(token,process.env.JWT_SECRET)
-    req.body=decoded
-    next()
-  }  
-  catch(e){
-    console.log(e)
-    return res.status(401).json({message:`Invalid token ${e.message}`})
-  }
+    jwt.verify(token,process.env.JWT_SECRET,(err,decoded)=>{
+    if (err){
+    console.log(err)
+    return res.status(401).json({message:`Invalid token ${err.message}`})
+    }
+    console.log(decoded)
+      req.body=decoded
+      next()
+    })
 
 }
 
@@ -60,7 +71,7 @@ const userSignUp = async (req,res)=>{
       console.log(user)
       const token = createToken(user._id)
       console.log(token)
-      //res.cookie("who",token,{httpOnly:true,maxAge:maxTime*1000})
+      res.cookie("who",token,{httpOnly:true,maxAge:maxTime*1000})
       user.token=token
       console.log(user)
       res.status(200).json({user})
@@ -88,27 +99,17 @@ const getAllUsers = asyncHandler(async(req,res)=>{
 
 //logging in user
 const userLogIn= async (req, res) => {
+  const {username, password}=req.body
   try{
-    const {username, password}=req.body
-    const user = await User.findOne({username:username})
-    if(!user){
-      res.status(404)
-      throw new Error(`cannot find user with the username ${username}`)
-    }
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(401).send('Invalid password');
-    }
-
-    const token= createToken(user._id)
+    const user = await User.login(username,password)
+    const token = createToken(user._id)
+    res.cookie("jwt",token,{httpOnly:true,maxAge:maxTime*1000})
+    console.log(token)
     user.token=token
-    await user.save()
     res.status(200).json({user});
-    
   } catch (e) {
-   
-     const error=ErrorHandler(e)
-     res.status(500).json({error})
+      const error=ErrorHandler(e)
+      res.status(404).json({error})
   }
 }
 
@@ -116,8 +117,8 @@ const userLogIn= async (req, res) => {
 
 const profile = async (req,res)=>{
   try{
-    const id=req.user.id
-    const user = await User.findById(id)
+    const {id}=req.params
+    const user = await User.findById({id})
     if(!user){
       res.status(404)
       throw new Error(`cannot find user with the Id ${id}`)
