@@ -14,7 +14,7 @@ const createRecipes =async (req,res)=>{
     try{
         const recipe= await Recipes.create(req.body)
         console.log(req.body)
-        res.status(201).json(recipe)
+        res.status(201).json(recipe,{successful:true})
     }
     catch(e){
         res.status(500).json({message:`Could not create ${e.message}`});
