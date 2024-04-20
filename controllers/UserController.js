@@ -55,7 +55,7 @@ const verifyToken = (req, res, next) => {
   //    self.age = age
   //
   //  function fromJson(json) {
-  //    Name(name: json["name"], age: json["age"]) co
+  //    Name(name: json["name"], age: json["age"]) const
   //    // name = json["data"]["name"]
   //    // age = json["data"]["age"]
   //  }
@@ -65,13 +65,13 @@ const verifyToken = (req, res, next) => {
   /// 3*. Loop arrays
 
   const token = req.headers["authorization"];
-  //const actualToken = token && token.startsWith("Bearer ") ? token.split(" ")[1] : null;
-  
+  const actualToken = token && token.startsWith("Bearer ") ? token.split(" ")[1] : null;
+  console.log(actualToken)
   console.log("Trying to check if anything occurs");
-  if (!token) {
+  if (!actualToken) {
     return res.status(401).json({ message: "token required" });
   }
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(actualToken, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       console.log(err);
       return res.status(401).json({ message: `Invalid token ${err.message}` });
