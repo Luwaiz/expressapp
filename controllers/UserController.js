@@ -65,7 +65,7 @@ const verifyToken = (req, res, next) => {
   /// 3*. Loop arrays
 
   const token = req.headers["authorization"];
-  const actualToken = token && token.startsWith("Bearer ") ? token.split(" ")[1] : null;
+  //const actualToken = token && token.startsWith("Bearer ") ? token.split(" ")[1] : null;
   console.log(actualToken)
   console.log("Trying to check if anything occurs");
   if (!token) {
