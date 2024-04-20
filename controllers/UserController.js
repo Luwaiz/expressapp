@@ -55,7 +55,7 @@ const verifyToken = (req, res, next) => {
   //    self.age = age
   //
   //  function fromJson(json) {
-  //    Name(name: json["name"], age: json["age"])
+  //    Name(name: json["name"], age: json["age"]) co
   //    // name = json["data"]["name"]
   //    // age = json["data"]["age"]
   //  }
@@ -67,10 +67,11 @@ const verifyToken = (req, res, next) => {
   const token = req.headers["authorization"];
   const actualToken = token && token.startsWith("Bearer ") ? token.split(" ")[1] : null;
   console.log(actualToken)
-  if (!actualToken) {
+  console.log("Trying to check if anything occurs");
+  if (!token) {
     return res.status(401).json({ message: "token required" });
   }
-  jwt.verify(actualToken, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       console.log(err);
       return res.status(401).json({ message: `Invalid token ${err.message}` });
@@ -135,6 +136,10 @@ const profile = async (req, res) => {
     const user = await User.profile(id);
     res.status(200).json(user);
   } catch (e) {
+    // res.status(500)
+    // console.log(error)
+    // throw new Error(error.message)\
+
     res.status(500).json({ message: e.message });
   }
 };
