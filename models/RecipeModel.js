@@ -39,6 +39,10 @@
  })
 
  const RecipeModel = mongoose.Schema({
+    userId:{
+        type: String,
+        required:["User Id required"]
+    },
     name:{
         type: String,
         required:["Please enter the name of your recipe"]

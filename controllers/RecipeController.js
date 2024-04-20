@@ -12,9 +12,16 @@ const getAllRecipes = async (req, res) => {
 }
 const createRecipes =async (req,res)=>{
     try{
+        console.log(req.decodedToken)
+        console.log(req.decodedToken.id)
+        req.body.userId=req.decodedToken.id
         const recipe= await Recipes.create(req.body)
+        console.log(req.decodedToken.id)
+        
+        console.log(recipe.userId)
+        await recipe.save()
         console.log(req.body)
-        res.status(201).json(recipe,{successful:true})
+        res.status(201).json({successful:recipe})
     }
     catch(e){
         res.status(500).json({message:`Could not create ${e.message}`});
