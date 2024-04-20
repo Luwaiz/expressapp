@@ -66,7 +66,7 @@ const verifyToken = (req, res, next) => {
 
   const token = req.headers["authorization"];
   //const actualToken = token && token.startsWith("Bearer ") ? token.split(" ")[1] : null;
-  console.log(actualToken)
+  
   console.log("Trying to check if anything occurs");
   if (!token) {
     return res.status(401).json({ message: "token required" });
