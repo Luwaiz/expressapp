@@ -56,6 +56,10 @@
         type:String,
         required:false,
     },
+    servings:{
+        type:Number,
+        required:true,
+    },
     ingredients:{
         type:[Ingredients],
         required:true
