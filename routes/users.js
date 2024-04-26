@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {getAllUsers,getUserById,deleteUserById,
-    userSignUp, updateUser,userLogIn,profile,
+    userSignUp, updateUser,userLogIn,profile, patchUser,
     verifyToken}= require("../controllers/UserController");
 const User = require('../models/UserModel');
 const cookieParser =  require("cookie-parser")
@@ -30,5 +30,8 @@ router.post("/" ,userSignUp)
 
 //put method to update a user
 router.put("/:id",updateUser)
+
+//patch method to update a user
+router.patch("/:id",verifyToken,patchUser)
 
 module.exports = router;

@@ -59,6 +59,28 @@ userSchema.statics.profile = async function(id){
 
 }
 
+userSchema.statics.patch = async function(id,body){
+    const user = await this.findById({_id:id})
+    if(user){
+        // if(body.id){
+        //     user.id = id
+        // }
+        if(body.username){
+            user.username = body.username
+        }
+        if(body.email){
+            user.email = body.email
+        }
+        if(body.password){
+            const salt = await bcrypt.genSalt()
+            const hashedPassword = await bcrypt.hash(body.password,salt)
+            user.password =hashedPassword
+        }
+        const patchUser= await user.save()
+        return patchUser
+    }
+    throw new Error(`cannot find user with the id${id}`)
+}
 const User = mongoose.model("user",userSchema)
 
 module.exports= User

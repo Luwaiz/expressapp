@@ -171,8 +171,8 @@ const deleteUserById = asyncHandler(async (req, res) => {
     }
     res.status(200).json(user);
   } catch (e) {
-    res.status(500);
-    throw new Error(error.message);
+    res.status(404)
+    throw new Error(e.message);
   }
 });
 
@@ -186,14 +186,31 @@ const updateUser = asyncHandler(async (req, res) => {
       throw new Error(`cannot find user with the Id ${id}`);
     }
     const UpdatedUser = await User.findById(id);
-    res.status(200).json(UpdatedUser);
+    console.log(UpdatedUser)
+    res.status(200).json(user);
   } catch (e) {
     res.status(500);
     throw new Error(error.message);
   }
 });
 
+const patchUser = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(req.body.token);
+    const user = await User.findOneAndUpdate({_id:id},req.body,{new : true});
+    console.log(user)
+    await user.save();
+    console.log(user)
+    res.status(200).json(user);
+  } catch (e) {
+    console.log(e);
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
 module.exports = {
+  patchUser,
   getAllUsers,
   getUserById,
   deleteUserById,
