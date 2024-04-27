@@ -1,4 +1,5 @@
 const Recipes = require('../models/RecipeModel')
+const cloudinary = require('../utilities/cloudinary')
 
 
 const getAllRecipes = async (req, res) => {
@@ -11,9 +12,16 @@ const getAllRecipes = async (req, res) => {
     }
 }
 const createRecipes =async (req,res)=>{
+
     try{
         req.body.userId=req.decodedToken.id
-        const recipe= await Recipes.create(req.body)
+        const imageSetup = await cloudinary.uploader.upload(req.body.image,{
+            folder:"Recipes"
+        })
+        const recipe= await Recipes.create({...req.body,image:{
+            public_id:imageSetup.public_id,
+            url:imageSetup.secure_url
+        }})
         console.log(req.decodedToken.id)
         console.log(recipe.userId)
         await recipe.save()
@@ -22,7 +30,7 @@ const createRecipes =async (req,res)=>{
     }
     catch(e){
         res.status(500).json({message:`Could not create ${e.message}`});
-        console.log(Object(e.message))
+        console.log(e.message)
     }
 }
 const deleteRecipe = async (req, res) => {
