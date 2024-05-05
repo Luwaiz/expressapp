@@ -15,13 +15,8 @@ const createRecipes =async (req,res)=>{
 
     try{
         req.body.userId=req.decodedToken.id
-        const imageSetup = await cloudinary.uploader.upload(req.body.image,{
-            folder:"Recipes"
-        })
-        const recipe= await Recipes.create({...req.body,image:{
-            public_id:imageSetup.public_id,
-            url:imageSetup.secure_url
-        }})
+      
+        const recipe= await Recipes.create(req.body)
         console.log(req.decodedToken.id)
         console.log(recipe.userId)
         await recipe.save()
@@ -29,8 +24,8 @@ const createRecipes =async (req,res)=>{
         res.status(201).json(recipe)
     }
     catch(e){
-        res.status(500).json({message:`Could not create ${e.message}`});
-        console.log(e.message)
+        res.status(500).json({message:`Could not create ${e}`});
+        console.log(e)
     }
 }
 const deleteRecipe = async (req, res) => {

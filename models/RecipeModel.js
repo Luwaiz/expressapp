@@ -47,16 +47,6 @@
         type: String,
         required:["Please enter the name of your recipe"]
     },
-    image:{
-        public_id:{
-            type: String,
-            required:[true,"Please upload an image"]
-        },
-        url:{
-        type: String,
-        required:[true,"image needed to be uploaded"]
-        }
-    },
     cookingTime:{
         type:CookingTime,
         required:[true,"Please enter the allocated cooking time"],
